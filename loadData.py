@@ -1,9 +1,9 @@
+import os
 import torch
 from torch.utils.data import DataLoader, Dataset
-import torchvision
+import torchvision  
 from torchvision import transforms, datasets
-import glob
 
 #Loading data from folder
-imageDir = glob.glob("../data/*/total/")
-#fullDataset = datasets.ImageFolder(imageDir,transform=transforms.ToTensor)
+imageDir = os.path.dirname(os.path.dirname(__file__)) + "/FruitFinder/data/"
+fullDataset = datasets.ImageFolder(imageDir,transform=transforms.ToTensor)
