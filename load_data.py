@@ -2,8 +2,9 @@ import os
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from torch.utils.data import DataLoader, Dataset, SubsetRandomSampler
 import torchvision  
+
+from torch.utils.data import DataLoader, Dataset, SubsetRandomSampler
 from torchvision import transforms, datasets
 
 #Loading data from folder
@@ -31,17 +32,8 @@ def split_data(dataset,valid_percent):
 
     return train_loader, valid_loader
 
+#Utility function to show images
 def imshow(img):
     npimg = img.numpy()
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
-
-def run():
-    data = load_data()
-    train, test = split_data(data, 20)
-    
-    data_iter = iter(train)
-    images, labels = data_iter.next()
-    imshow(torchvision.utils.make_grid(images))
-
-run()
