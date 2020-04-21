@@ -11,7 +11,7 @@ from torchvision import transforms, datasets
 def load_data():
     #images_dir = os.path.dirname(os.path.dirname(__file__)) + "/FruitFinder/data/" 
     transform = transforms.Compose(
-    [transforms.Resize((256,256)),
+    [transforms.Resize((32,32)),
      transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])    
     fruit_dataset = datasets.ImageFolder("data/",transform=transform)
