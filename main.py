@@ -7,7 +7,7 @@ import torch.optim as optim
 from neural_net import *
 from load_data import *
 
-def main():
+def train(path):
     #Load and split data into train and test
     data = load_data()
     train, valid = split_data(data, 20)
@@ -50,4 +50,27 @@ def main():
 
     print('Finished Training')
 
-main()
+    #Save the model
+    torch.save(net.state_dict(), path)
+
+    # #Load and eval
+    # print("Made it to eval")
+    # net = Net()
+    # net.load_state_dict(torch.load(path))
+    # print("Made it to loading")
+    # correct = 0
+    # total = 0
+    # with torch.no_grad():
+    #     for data in valid:
+    #         images, labels = data
+    #         outputs = net(images)
+    #         _, predicted = torch.max(outputs.data, 1)
+    #         total += labels.size(0)
+    #         correct += (predicted == labels).sum().item()
+    #         print(correct/total)
+
+    # print('Accuracy of the network on the 10000 test images: %d %%' % (
+    #     100 * correct / total))
+
+PATH = "./model/sample_model.pth"
+train(PATH)
