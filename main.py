@@ -20,7 +20,6 @@ def train(path):
 
     #Create a CNN to train on (resnet 18)
     net = models.resnet18(pretrained=False)
-    print(net)
 
     #Define an optimizer for the CNN
     criterion = nn.CrossEntropyLoss()
@@ -28,9 +27,11 @@ def train(path):
 
     #Train the network with backprop
     net.train()
+    print('Starting Training')
     for epoch in range(2):  # loop over the dataset multiple times
         running_loss = 0.0
         for i, data in enumerate(train, 0):
+            print(i)
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
 
