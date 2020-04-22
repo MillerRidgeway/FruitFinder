@@ -3,6 +3,7 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import torch.optim as optim
+import torchvision.models as models
 
 from neural_net import *
 from load_data import *
@@ -16,16 +17,17 @@ def train(path):
     data_iter = iter(train)
     images, labels = data_iter.next()
     imshow(torchvision.utils.make_grid(images))
-    print(' '.join('%5s' % labels[j] for j in range(4)))
 
-    #Create a CNN to train on
-    net = Net()
+    #Create a CNN to train on (resnet 18)
+    net = models.resnet18(pretrained=False)
+    print(net)
 
     #Define an optimizer for the CNN
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9, weight_decay=1e-4)
 
     #Train the network with backprop
+    net.train()
     for epoch in range(2):  # loop over the dataset multiple times
         running_loss = 0.0
         for i, data in enumerate(train, 0):
