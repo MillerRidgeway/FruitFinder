@@ -9,6 +9,7 @@ Created on Tue Apr 21 20:26:47 2020
 import time
 import sys
 import torch
+import os
 
 import torch.nn as nn
 import torch.nn.parallel
@@ -191,7 +192,7 @@ world_size = 2
 dist_backend = 'nccl'
 
 # Url used to setup distributed training
-dist_url = "file:///s/chopin/a/grad/wpickard/cs535/distrib_store"
+dist_url = "file://" + os.path.join(os.getcwd(), 'dist_store')
 
 print("Initialize Process Group...")
 # Initialize Process Group
