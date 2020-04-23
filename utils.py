@@ -36,9 +36,15 @@ def accuracy(output, target, topk=(1,)):
             correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
             res.append(correct_k.mul_(100.0 / batch_size))
         return res
-        
+
 def adjust_learning_rate(initial_lr, optimizer, epoch):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
     lr = initial_lr * (0.1 ** (epoch // 30))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
+        
+#Utility function to show images
+def imshow(img):
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.show()

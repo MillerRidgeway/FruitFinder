@@ -41,9 +41,3 @@ def split_data(dataset,valid_percent, batch_size, num_workers, pin_memory = True
                                                  shuffle=False)
 
     return train_loader, valid_loader
-
-#Utility function to show images
-def imshow(img):
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
