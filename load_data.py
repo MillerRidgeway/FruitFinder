@@ -11,14 +11,14 @@ from torchvision import transforms, datasets
 def load_data():
     #images_dir = os.path.dirname(os.path.dirname(__file__)) + "/FruitFinder/data/" 
     transform = transforms.Compose(
-    [transforms.Resize((224,224)),
+    [transforms.Resize((224, 224)),
      transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])    
     fruit_dataset = datasets.ImageFolder("data/",transform=transform)
     return fruit_dataset
 
 #Split the dataset into train/test
-def split_data(dataset,valid_percent):
+def split_data(dataset,valid_percent, batch_size, num_workers, pin_memory = True, sampler = None):
     num_train = len(dataset)
     split = int(np.floor(valid_percent*num_train))
 
@@ -27,8 +27,8 @@ def split_data(dataset,valid_percent):
     train_sampler = SubsetRandomSampler(train_idx)
     valid_sampler = SubsetRandomSampler(valid_idx)
 
-    train_loader = torch.utils.data.DataLoader(dataset, 32, train_sampler)
-    valid_loader = torch.utils.data.DataLoader(dataset, 32, valid_sampler)
+    train_loader = torch.utils.data.DataLoader(dataset, 128, train_sampler)
+    valid_loader = torch.utils.data.DataLoader(dataset, 128, valid_sampler)
 
     return train_loader, valid_loader
 
