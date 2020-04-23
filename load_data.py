@@ -8,8 +8,7 @@ from torch.utils.data import DataLoader, Dataset, SubsetRandomSampler
 from torchvision import transforms, datasets
 
 #Loading data from folder
-def load_data():
-    #images_dir = os.path.dirname(os.path.dirname(__file__)) + "/FruitFinder/data/" 
+def load_data(): 
     transform = transforms.Compose(
     [transforms.Resize((224, 224)),
      transforms.ToTensor(),
@@ -18,17 +17,28 @@ def load_data():
     return fruit_dataset
 
 #Split the dataset into train/test
-def split_data(dataset,valid_percent, batch_size, num_workers, pin_memory = True, sampler = None):
+def split_data(dataset,valid_percent, batch_size, num_workers, pin_memory = True, dist = True):
     num_train = len(dataset)
     split = int(np.floor(valid_percent*num_train))
 
     train_idx, valid_idx = torch.utils.data.dataset.random_split(dataset,
                                                          [num_train - split, split])
-    train_sampler = SubsetRandomSampler(train_idx)
-    valid_sampler = SubsetRandomSampler(valid_idx)
 
-    train_loader = torch.utils.data.DataLoader(dataset, 128, train_sampler)
-    valid_loader = torch.utils.data.DataLoader(dataset, 128, valid_sampler)
+    sampler = None
+    if(dist):
+        sampler = torch.utils.data.distributed.DistributedSampler(train_idx)  
+
+    train_loader = torch.utils.data.DataLoader(dataset, 
+                                                batch_size = batch_size, 
+                                                num_workers = num_workers,
+                                                shuffle=(sampler is None),
+                                                sampler = sampler,
+                                                pin_memory=pin_memory)
+    valid_loader = torch.utils.data.DataLoader(dataset, 
+                                                 batch_size = batch_size,
+                                                 num_workers = num_workers,
+                                                 pin_memory=pin_memory,
+                                                 shuffle=False)
 
     return train_loader, valid_loader
 
