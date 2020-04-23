@@ -215,11 +215,10 @@ criterion = nn.CrossEntropyLoss().cuda()
 optimizer = torch.optim.SGD(model.parameters(), starting_lr, momentum=0.9, weight_decay=1e-4)
 
 print("Initialize Dataloaders...")
-# Define the transform for the data. Notice, we must resize to 224x224 with this dataset and model.
+# Define the transform for the data. From the fruit dataset spec images should be 320x258.
 transform = transforms.Compose(
     [
-    #transforms.RandomResizedCrop(224),
-     transforms.Resize((480, 322)),
+     transforms.Resize((320,258)),
      transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
