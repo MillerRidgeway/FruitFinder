@@ -171,7 +171,7 @@ def adjust_learning_rate(initial_lr, optimizer, epoch):
 print("Collect Inputs...")
 
 # Batch Size for training and testing
-batch_size = 32
+batch_size = 128
 
 # Percentage of dataset to reserve for validation
 valid_percent = 0.2
@@ -218,7 +218,7 @@ print("Initialize Dataloaders...")
 # Define the transform for the data. From the fruit dataset spec images should be 320x258.
 transform = transforms.Compose(
     [
-     transforms.Resize((320,258)),
+     transforms.Resize((258,320)),  # RESIZE IS HXW!
      transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
