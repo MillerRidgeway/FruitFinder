@@ -28,13 +28,13 @@ def split_data(dataset,valid_percent, batch_size, num_workers, pin_memory = True
     if(dist):
         sampler = torch.utils.data.distributed.DistributedSampler(train_idx)  
 
-    train_loader = torch.utils.data.DataLoader(dataset, 
+    train_loader = torch.utils.data.DataLoader(train_idx, 
                                                 batch_size = batch_size, 
                                                 num_workers = num_workers,
                                                 shuffle=(sampler is None),
                                                 sampler = sampler,
                                                 pin_memory=pin_memory)
-    valid_loader = torch.utils.data.DataLoader(dataset, 
+    valid_loader = torch.utils.data.DataLoader(valid_idx, 
                                                  batch_size = batch_size,
                                                  num_workers = num_workers,
                                                  pin_memory=pin_memory,

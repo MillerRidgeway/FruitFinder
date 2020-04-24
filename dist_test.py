@@ -67,7 +67,6 @@ train_loader, valid_loader = split_data(fruit_dataset, 20, batch_size, workers, 
 best_prec1 = 0
 
 start = time.time()
-print("Training started at: " + str(start))
 for epoch in range(num_epochs):
     # Adjust learning rate according to schedule
     adjust_learning_rate(starting_lr, optimizer, epoch)
