@@ -17,27 +17,31 @@ def load_data():
     return fruit_dataset
 
 #Split the dataset into train/test
-def split_data(dataset,valid_percent, batch_size, num_workers, pin_memory = True, dist = True):
-    num_train = len(dataset)
-    split = int(np.floor(valid_percent*num_train))
-
-    train_idx, valid_idx = torch.utils.data.dataset.random_split(dataset,
+def split_data(fruit_dataset, valid_percent, batch_size, num_workers, dist = True):
+    num_train = len(fruit_dataset)
+    split = int(valid_percent*num_train)
+    trainset, valset = torch.utils.data.dataset.random_split(fruit_dataset,
                                                          [num_train - split, split])
 
-    sampler = None
-    if(dist):
-        sampler = torch.utils.data.distributed.DistributedSampler(train_idx)  
+    print("Dataset split into: ", [len(trainset), len(valset)])
 
-    train_loader = torch.utils.data.DataLoader(train_idx, 
-                                                batch_size = batch_size, 
-                                                num_workers = num_workers,
-                                                shuffle=(sampler is None),
-                                                sampler = sampler,
-                                                pin_memory=pin_memory)
-    valid_loader = torch.utils.data.DataLoader(valid_idx, 
-                                                 batch_size = batch_size,
-                                                 num_workers = num_workers,
-                                                 pin_memory=pin_memory,
-                                                 shuffle=False)
 
-    return train_loader, valid_loader
+    # Create distributed samplers
+    train_sampler = torch.utils.data.distributed.DistributedSampler(trainset)
+
+    #  Create loaders
+    train_loader = torch.utils.data.DataLoader(trainset,
+                                            batch_size=batch_size, 
+                                            shuffle=(train_sampler is None), 
+                                            num_workers=num_workers, 
+                                            pin_memory=True, 
+                                            sampler=train_sampler)
+
+    val_loader = torch.utils.data.DataLoader(valset,
+                                            batch_size=batch_size, 
+                                            shuffle=False, 
+                                            num_workers=num_workers, 
+                                            pin_memory=True)
+    print ("Loaders created. ", train_loader, val_loader)    
+
+    return train_loader, val_loader
