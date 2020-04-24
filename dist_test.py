@@ -44,10 +44,12 @@ dist_backend = 'nccl'
 dist_url = "file://" + os.path.join(os.getcwd(), 'dist_store')
 
 #Process group init
+print("Init process group")
 dist.init_process_group(backend=dist_backend, init_method=dist_url,
                         rank=int(sys.argv[1]), world_size=world_size)
 
 #Model init
+print("Model init")
 model = models.resnet18(pretrained=False).cuda()
 model = torch.nn.parallel.DistributedDataParallel(model)
 
@@ -57,6 +59,7 @@ optimizer = torch.optim.SGD(model.parameters(), starting_lr,
                             momentum=0.9, weight_decay=1e-4)
 
 #Load data and split for train/test
+print("Load data for training")
 fruit_dataset = load_data();
 train_loader, valid_loader = split_data(fruit_dataset, 20, batch_size, workers, dist=True)
 
@@ -64,6 +67,7 @@ train_loader, valid_loader = split_data(fruit_dataset, 20, batch_size, workers, 
 best_prec1 = 0
 
 start = time.time()
+print("Training started at: " + str(start))
 for epoch in range(num_epochs):
     # Adjust learning rate according to schedule
     adjust_learning_rate(starting_lr, optimizer, epoch)
