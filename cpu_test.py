@@ -42,7 +42,7 @@ optimizer = torch.optim.SGD(model.parameters(), starting_lr,
 
 #Load Data
 fruit_dataset = load_data()
-train_loader, valid_loader = split_data(fruit_dataset, 20, batch_size, workers, dist=False)
+train_loader, valid_loader = split_data(fruit_dataset, 0.2, batch_size, workers, dist=False)
 
 # Training loop
 best_prec1 = 0

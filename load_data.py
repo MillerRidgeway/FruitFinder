@@ -27,7 +27,9 @@ def split_data(fruit_dataset, valid_percent, batch_size, num_workers, dist = Tru
 
 
     # Create distributed samplers
-    train_sampler = torch.utils.data.distributed.DistributedSampler(trainset)
+    train_sampler = None
+    if(dist):
+        train_sampler = torch.utils.data.distributed.DistributedSampler(trainset)
 
     #  Create loaders
     train_loader = torch.utils.data.DataLoader(trainset,
