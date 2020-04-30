@@ -23,7 +23,7 @@ from validate import *
 # List of machines from lab 325 to use
 machines = ['turbot','brill','flounder','sardine','eel']
 
-def dist_train(world_size, rank):
+def dist_train(world_size, rank, auto=False):
     print("dist_train",world_size,rank)
     # Batch Size for training and testing
     batch_size = 128
@@ -54,7 +54,7 @@ def dist_train(world_size, rank):
     dist.init_process_group(backend=dist_backend, init_method=dist_url,
                             rank=rank, world_size=world_size)
 
-    if rank == 0:
+    if rank == 0 and auto:
         #Launch nodes (this is potentially a very uncontrolled way of doing this)
         proc = [None] * (world_size - 1)
 
@@ -120,14 +120,14 @@ def dist_train(world_size, rank):
 def dist_kill():
     '''WARNING!!! This is a sledgehammer! It will kill all ipython procs!'''
     for machine in machines:
-      run(["ssh",machine,"killall -9 ipython"])
+        run(["ssh",machine,"killall -9 ipython"])
 
 
 if __name__ == "__main__":
     world_size = int(sys.argv[1])
-    rank = 0
 
-    if sys.argv[2] != None:
-      rank = int(sys.argv[2])
-
-    model, metrics = dist_train(world_size, rank)
+    if len(sys.argv) > 2:
+        rank = int(sys.argv[2])
+        model, metrics = dist_train(world_size, rank, auto=False)
+    else:
+        model, metrics = dist_train(world_size, 0, auto=True)
