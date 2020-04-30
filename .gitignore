@@ -1,4 +1,4 @@
 data/
 __pycache__/
-distrib_store
+dist_store
 .ipynb_checkpoints/
