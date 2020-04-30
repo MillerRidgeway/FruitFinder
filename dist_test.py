@@ -80,9 +80,17 @@ def dist_train(world_size, rank, auto=False):
     fruit_dataset = load_data();
     train_loader, valid_loader = split_data(fruit_dataset, valid_percent, batch_size, workers, dist=True)
 
-    # Training loop
-    best_prec1 = 0
+    # Setup trace
+    trace = {'batch_time': [],
+             'data_time': [],
+             'losses': [],
+             'top1': [],
+             'epoch': [],
+             't': []}
 
+    epoch_time = AverageMeter()
+
+    # Training loop
     start = time.time()
     for epoch in range(num_epochs):
         # Adjust learning rate according to schedule
@@ -90,22 +98,17 @@ def dist_train(world_size, rank, auto=False):
 
         # train for one epoch
         print("\nBegin Training Epoch {}".format(epoch+1))
-        train(train_loader, model, criterion, optimizer, epoch, cuda = True)
+        train(train_loader, model, criterion, optimizer, epoch, cuda = True, trace = trace)
 
-        # evaluate on validation set
-        print("Begin Validation @ Epoch {}".format(epoch+1))
-        prec1 = validate(valid_loader, model, criterion, cuda = True)
-
-        # remember best prec@1 and save checkpoint if desired
-        # is_best = prec1 > best_prec1
-        best_prec1 = max(prec1, best_prec1)
-
-        print("Epoch Summary: ")
-        print("\tEpoch Accuracy: {}".format(prec1))
-        print("\tBest Accuracy: {}".format(best_prec1))
+        # Update average epoch time
+        epoch_time.update(trace['batch_time'][-1])
 
     train_time = time.time() - start
     print("Total elapsed training time: ", train_time)
+
+    # evaluate on validation set
+    print("Begin Validation")
+    prec1 = validate(valid_loader, model, criterion, cuda = True)
 
     # Gather metrics for run
     metrics = {'model': 'resnet18',
@@ -113,7 +116,13 @@ def dist_train(world_size, rank, auto=False):
                'batch_size': batch_size,
                'world_size': world_size,
                'train_time': train_time,
-               'best_prec1': best_prec1}
+               'epoch_time': epoch_time.avg,
+               'gpu': True,
+               'prec1': prec1.cpu(),
+               'trace': trace}
+
+    # Cleanup process group for another run
+    dist.destroy_process_group()
 
     return model, metrics
 
