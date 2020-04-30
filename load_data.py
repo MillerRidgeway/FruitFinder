@@ -20,6 +20,8 @@ def load_data():
 def split_data(fruit_dataset, valid_percent, batch_size, num_workers, dist = True):
     num_train = len(fruit_dataset)
     split = int(valid_percent*num_train)
+    # We need this not to be "random" across nodes
+    torch.manual_seed(42)
     trainset, valset = torch.utils.data.dataset.random_split(fruit_dataset,
                                                          [num_train - split, split])
 
