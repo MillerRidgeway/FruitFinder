@@ -2,17 +2,18 @@ import os
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-import torchvision  
+import torchvision
 
 from torch.utils.data import DataLoader, Dataset, SubsetRandomSampler
 from torchvision import transforms, datasets
 
 #Loading data from folder
-def load_data(): 
+def load_data():
     transform = transforms.Compose(
-    [transforms.Resize((224, 224)),
-     transforms.ToTensor(),
-     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])    
+        [transforms.Resize((258,320)),
+         transforms.ToTensor(),
+         transforms.Normalize(mean=[0.5032, 0.5149, 0.4498], std=[0.2390, 0.2399, 0.2564])])
+
     fruit_dataset = datasets.ImageFolder("data/",transform=transform)
     return fruit_dataset
 
