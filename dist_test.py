@@ -47,6 +47,8 @@ def dist_train(world_size, rank, auto=False):
     dist_backend = 'nccl'
 
     # Url used to setup distributed training
+    if rank == 0 and os.path.exists('dist_store'):
+        os.remove('dist_store')
     dist_url = "file://" + os.path.join(os.getcwd(), 'dist_store')
 
     #Process group init
@@ -59,11 +61,12 @@ def dist_train(world_size, rank, auto=False):
         proc = [None] * (world_size - 1)
 
         for i in range(world_size - 1):
-            print('Launching node: ' + str(i + 1))
-            proc[i] = Popen(["ssh",machines[i],"cd",os.getcwd(),"; ipython dist_test.py",str(world_size),str(i + 1)],)
-                         #stdout=DEVNULL,
+            print('Launching node: ' + str(i + 1) + " " + machines[i])
+            proc[i] = Popen(["ssh",machines[i],"cd",os.getcwd(),"; ipython dist_test.py",str(world_size),str(i + 1)],
+                         stdout=DEVNULL,
+                         stdin=DEVNULL,
                          #stderr=DEVNULL,
-                         #stdin=DEVNULL)
+                         )
 
     #Model init
     print("Model init")
@@ -110,26 +113,54 @@ def dist_train(world_size, rank, auto=False):
     print("Begin Validation")
     prec1 = validate(valid_loader, model, criterion, cuda = True)
 
-    # Gather metrics for run
-    metrics = {'model': 'resnet18',
-               'num_epochs': num_epochs,
-               'batch_size': batch_size,
-               'world_size': world_size,
-               'train_time': train_time,
-               'epoch_time': epoch_time.avg,
-               'gpu': True,
-               'prec1': prec1.cpu(),
-               'trace': trace}
+    if rank == 0:
+        # Gather metrics for run
+        metrics = {'model': 'resnet18',
+                   'num_epochs': num_epochs,
+                   'batch_size': batch_size,
+                   'world_size': world_size,
+                   'train_time': train_time,
+                   'epoch_time': epoch_time.avg,
+                   'gpu': True,
+                   'prec1': prec1.cpu(),
+                   'trace': trace}
 
-    # Cleanup process group for another run
-    dist.destroy_process_group()
+        # Wait for nodes to complete
+        print("Waiting for nodes to complete...")
+        for p in proc:
+            p.wait()
 
-    return model, metrics
+        return model, metrics
 
 def dist_kill():
     '''WARNING!!! This is a sledgehammer! It will kill all ipython procs!'''
     for machine in machines:
         run(["ssh",machine,"killall -9 ipython"])
+
+def test_mult(world_sizes):
+    metrics_all = []
+    model_best = None
+    prec1_best = 0
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+
+    for world_size in world_sizes:
+        model, metrics = dist_train(world_size, 0, auto=True)
+        metrics_all.append(metrics)
+
+        if prec1_best < metrics['prec1']:
+            prec1_best = metrics['prec1']
+            #model_best = model.cpu()
+
+        # Cleanup for another run
+        del model
+        dist.destroy_process_group()
+
+        # Save metric checkpoint for run
+        torch.save(metrics, 'metrics/metrics-'+str(world_size)+'-'+timestr+'.pt')
+
+    # Save to file
+    #torch.save(model_best, 'trained/resnet18-'+timestr+'.pt')
+    torch.save(metrics_all, 'metrics/metrics-all-'+timestr+'.pt')
 
 
 if __name__ == "__main__":
@@ -137,6 +168,6 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 2:
         rank = int(sys.argv[2])
-        model, metrics = dist_train(world_size, rank, auto=False)
+        dist_train(world_size, rank, auto=False)
     else:
         model, metrics = dist_train(world_size, 0, auto=True)
