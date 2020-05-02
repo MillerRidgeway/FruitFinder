@@ -1,7 +1,6 @@
 import os
 import torch
 import numpy as np
-import matplotlib.pyplot as plt
 import torchvision
 
 from torch.utils.data import DataLoader, Dataset, SubsetRandomSampler
