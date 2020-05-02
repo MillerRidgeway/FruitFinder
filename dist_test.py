@@ -21,7 +21,7 @@ from train import *
 from validate import *
 
 # List of machines from lab 325 to use
-machines = ['turbot','brill','flounder','sardine','eel']
+machines = ['turbot','tuna','char','sardine','tarpon','flounder','barracuda']
 
 def dist_train(world_size, rank, auto=False):
     print("dist_train",world_size,rank)
@@ -38,7 +38,7 @@ def dist_train(world_size, rank, auto=False):
     num_epochs = 5
 
     # Starting Learning Rate
-    starting_lr = 0.1
+    starting_lr = 0.01
 
     # Number of distributed processes
     #world_size = 2
