@@ -13,14 +13,14 @@ Launch 4 node training session.
 ipython dist_test.py 4
 ```
  
-You can run from an interactive session allowing you to work with the model and metrics afterword
+You can run this from an interactive session allowing you to work with the model and metrics afterword.
 
 ```python
 from dist_test import *
 model, metrics = dist_train(world_size, 0, auto=True)
 ```
 
-Also from interactive session you can run multiple tests back to back. Results saved to 'metrics/metrics-all-timestamp.pt'
+Also from interactive session, you can run multiple tests back to back. Results will be saved to 'metrics/metrics-all-timestamp.pt'.
 
 ```python
 from dist_test import *
